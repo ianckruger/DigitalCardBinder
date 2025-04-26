@@ -1,5 +1,6 @@
 [versions]
-agp = "8.9.2"
+agp = "8.8.2"
+cameraCoreVersion = "1.4.0"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -13,8 +14,12 @@ lifecycleLivedataKtx = "2.8.7"
 runtimeLivedata = "1.7.8"
 navigationCompose = "2.8.9"
 navigationComposeAndroid = "2.9.0-rc01"
+cameraCore = "1.4.2"
 
 [libraries]
+androidx-camera-core-v140 = { module = "androidx.camera:camera-core", version.ref = "cameraCoreVersion" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraCoreVersion" }
+androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraCoreVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
@@ -38,6 +43,7 @@ androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-navigation-compose-android = { group = "androidx.navigation", name = "navigation-compose-android", version.ref = "navigationComposeAndroid" }
 coil-compose = { module = "io.coil-kt:coil-compose", version = "2.4.0" }
+androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "cameraCore" }
 
 
 [plugins]

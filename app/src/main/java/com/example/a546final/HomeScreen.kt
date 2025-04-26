@@ -12,18 +12,10 @@ import androidx.navigation.NavController
 
 @Composable
 fun HomeScreen(navController: NavController, homeViewModel: HomeScreenViewModel) {
-
-    // get photos from photo repo
-    // val photos by photoViewModel.photos.collectAsState()
-    // might change to reflect room usage
-
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
-
-
-        Row() {
-
+        Row {
             Button(onClick = {
                 navController.navigate("take_photo")
             }) {

@@ -11,11 +11,11 @@ import androidx.navigation.NavController
 
 @Composable
 fun BinderScreen(navController: NavController, homeScreenViewModel: HomeScreenViewModel) {
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Blue)
-    ){
+    ) {
         Text("Hello")
     }
 }

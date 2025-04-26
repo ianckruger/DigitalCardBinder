@@ -6,13 +6,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-
 @Composable
 fun CardApp() {
-    // set a nav controller and create the view model for home screen
     val navController = rememberNavController()
     val homeViewModel: HomeScreenViewModel = viewModel()
-
 
     NavHost(navController, startDestination = "home_screen") {
         composable("home_screen") {
@@ -21,7 +18,6 @@ fun CardApp() {
                 homeViewModel = homeViewModel
             )
         }
-
 
         composable("take_photo") {
             CameraScreen(
@@ -35,8 +31,6 @@ fun CardApp() {
                 navController = navController,
                 homeScreenViewModel = homeViewModel
             )
-
         }
     }
-
 }
