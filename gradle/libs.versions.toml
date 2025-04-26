@@ -1,5 +1,5 @@
 [versions]
-agp = "8.8.2"
+agp = "8.9.2"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -37,6 +37,8 @@ androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtim
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-navigation-compose-android = { group = "androidx.navigation", name = "navigation-compose-android", version.ref = "navigationComposeAndroid" }
+coil-compose = { module = "io.coil-kt:coil-compose", version = "2.4.0" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
