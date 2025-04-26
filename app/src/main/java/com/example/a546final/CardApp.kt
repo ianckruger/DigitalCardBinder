@@ -1,0 +1,33 @@
+package com.example.a546final
+
+import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+
+
+@Composable
+fun CardApp() {
+    // set a nav controller and create the view model for home screen
+    val navController = rememberNavController()
+    val homeViewModel: HomeScreenViewModel = viewModel()
+
+
+    NavHost(navController, startDestination = "home_screen") {
+        composable("home_screen") {
+            HomeScreen(
+                navController = navController,
+                homeViewModel = homeViewModel
+            )
+        }
+    }
+
+    composable("take_photo") {
+        CameraScreen(
+            navController = navController,
+            homeViewModel = homeViewModel
+        )
+    }
+
+}
