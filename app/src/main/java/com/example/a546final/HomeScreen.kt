@@ -25,13 +25,13 @@ fun HomeScreen(navController: NavController, homeViewModel: HomeScreenViewModel)
         Row() {
 
             Button(onClick = {
-
+                navController.navigate("take_photo")
             }) {
                 Text("Upload New Card")
             }
 
             Button(onClick = {
-
+                navController.navigate("view_cards")
             }) {
                 Text("View Collection")
             }

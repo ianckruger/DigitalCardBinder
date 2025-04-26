@@ -29,6 +29,14 @@ fun CardApp() {
                 homeScreenViewModel = homeViewModel
             )
         }
+
+        composable("view_cards") {
+            BinderScreen(
+                navController = navController,
+                homeScreenViewModel = homeViewModel
+            )
+
+        }
     }
 
 }
