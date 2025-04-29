@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 fun CardApp() {
     val navController = rememberNavController()
     val homeViewModel: HomeScreenViewModel = viewModel()
+    val photoViewModel: PhotoViewModel = viewModel()
 
     NavHost(navController, startDestination = "home_screen") {
         composable("home_screen") {
@@ -29,7 +30,8 @@ fun CardApp() {
         composable("view_cards") {
             BinderScreen(
                 navController = navController,
-                photoViewModel = PhotoViewModel()
+                homeScreenViewModel = homeViewModel,
+                photoViewModel = photoViewModel
             )
         }
     }

@@ -17,7 +17,7 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
 
     fun addPhotoToDatabase(photo: Photo) {
         viewModelScope.launch {
-            repo.insertPhoto(photo)
+            repo.addPhoto(photo)
         }
     }
 
