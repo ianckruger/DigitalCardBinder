@@ -29,7 +29,7 @@ fun CardApp() {
         composable("view_cards") {
             BinderScreen(
                 navController = navController,
-                homeScreenViewModel = homeViewModel
+                photoViewModel = PhotoViewModel()
             )
         }
     }

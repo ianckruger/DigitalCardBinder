@@ -1,16 +1,26 @@
 package com.example.a546final
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-class PhotoViewModel(private val repository: PhotoRepository) : ViewModel() {
-    val photos: Flow<List<Photo>> = repository.getPhotos()
+class PhotoViewModel(application: Application) : AndroidViewModel(application) {
+    private val repo: PhotoRepository
+    val photos: LiveData<List<Photo>>
 
-    fun addPhotoToDatabase(photo: Photo) {
-        viewModelScope.launch {
-            repository.insertPhoto(photo)
-        }
+
+    init {
+        val dao = PhotoDatabase.getDatabase(application).photoDao()
+        repo = PhotoRepository(dao)
+        photos = repo.photos.asLiveData()
+    }
+
+    fun addPhotoToDatabase(name: String, uri: String) = viewModelScope.launch {
+        repo.addPhoto(Photo(name = name, uri = uri))
     }
 }
+
+
