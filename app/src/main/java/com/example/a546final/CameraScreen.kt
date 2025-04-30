@@ -1,23 +1,42 @@
 package com.example.a546final
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.camera.view.PreviewView
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import java.io.File
 
 @Composable
@@ -27,6 +46,21 @@ fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenVi
     val imageCapture = remember { ImageCapture.Builder().build() }
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     var isCameraInitialized by remember { mutableStateOf(false) }
+    var isCameraBound by remember { mutableStateOf(false) }
+
+    // Permission handling
+    var hasCameraPermission by remember { mutableStateOf(checkCameraPermission(context)) }
+
+    if (!hasCameraPermission) {
+        // Request permission
+        LaunchedEffect(Unit) {
+            requestCameraPermission(context) { granted ->
+                hasCameraPermission = granted
+            }
+        }
+        Text("Camera permission required.")
+        return
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (!isCameraInitialized) {
@@ -50,8 +84,10 @@ fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenVi
                             preview,
                             imageCapture
                         )
+                        isCameraBound = true
                     } catch (e: Exception) {
                         Log.e("CameraScreen", "Use case binding failed", e)
+                        isCameraBound = false
                     }
 
                     previewView
@@ -59,15 +95,33 @@ fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenVi
                 modifier = Modifier.fillMaxSize()
             )
         }
+        Column(modifier = Modifier.fillMaxWidth()) {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
 
         Button(
             onClick = {
-                takePhoto(imageCapture, context) { photo ->
-                    homeScreenViewModel.addPhotoToDatabase(photo)
-                    navController.popBackStack() // Navigate back to HomeScreen after saving
+                if (isCameraBound) {
+                    takePhoto(imageCapture, context) { photo ->
+                        homeScreenViewModel.addPhotoToDatabase(photo)
+                        navController.popBackStack()
+                    }
+                } else {
+                    Log.e("CameraScreen", "Camera is not bound. Cannot take photo.")
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
             Text("Capture Photo")
         }
@@ -96,4 +150,27 @@ private fun takePhoto(imageCapture: ImageCapture, context: Context, onPhotoSaved
             }
         }
     )
+}
+
+private fun checkCameraPermission(context: Context): Boolean {
+    return ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.CAMERA
+    ) == PackageManager.PERMISSION_GRANTED
+}
+
+private fun requestCameraPermission(context: Context, onPermissionResult: (Boolean) -> Unit) {
+    if (ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.CAMERA
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        ActivityCompat.requestPermissions(
+            context as android.app.Activity,
+            arrayOf(Manifest.permission.CAMERA),
+            0
+        )
+    } else {
+        onPermissionResult(true)
+    }
 }
