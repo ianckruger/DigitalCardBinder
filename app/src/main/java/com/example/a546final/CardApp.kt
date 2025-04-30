@@ -11,6 +11,7 @@ fun CardApp() {
     val navController = rememberNavController()
     val homeViewModel: HomeScreenViewModel = viewModel()
     val photoViewModel: PhotoViewModel = viewModel()
+    val cameraViewModel: CameraViewModel = viewModel()
 
     NavHost(navController, startDestination = "home_screen") {
         composable("home_screen") {
@@ -23,7 +24,8 @@ fun CardApp() {
         composable("take_photo") {
             CameraScreen(
                 navController = navController,
-                homeScreenViewModel = homeViewModel
+                homeScreenViewModel = homeViewModel,
+                cameraViewModel = cameraViewModel
             )
         }
 

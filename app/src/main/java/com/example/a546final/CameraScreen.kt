@@ -5,77 +5,99 @@ import android.util.Log
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavController
-import androidx.camera.view.PreviewView
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import java.io.File
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenViewModel) {
+fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenViewModel, cameraViewModel: CameraViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val imageCapture = remember { ImageCapture.Builder().build() }
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     var isCameraInitialized by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (!isCameraInitialized) {
-            Text("Initializing Camera...")
-        } else {
-            AndroidView(
-                factory = { ctx ->
-                    val previewView = PreviewView(ctx)
-                    val cameraProvider = cameraProviderFuture.get()
+    val cameraPermissionState = rememberPermissionState(
+        android.Manifest.permission.CAMERA
+    )
 
-                    val preview = androidx.camera.core.Preview.Builder().build().also {
-                        it.setSurfaceProvider(previewView.surfaceProvider)
+    if(cameraPermissionState.status.isGranted) {
+        Box(modifier = Modifier
+            .fillMaxSize())
+        {
+            if (!isCameraInitialized) {
+                Text("Initializing Camera...")
+            } else {
+                AndroidView(
+                    factory = { ctx ->
+                        val previewView = PreviewView(ctx)
+                        val cameraProvider = cameraProviderFuture.get()
+
+                        val preview = androidx.camera.core.Preview.Builder().build().also {
+                            it.setSurfaceProvider(previewView.surfaceProvider)
+                        }
+
+                        try {
+                            val cameraSelector =
+                                androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
+                            cameraProvider.unbindAll()
+                            cameraProvider.bindToLifecycle(
+                                lifecycleOwner,
+                                cameraSelector,
+                                preview,
+                                imageCapture
+                            )
+                        } catch (e: Exception) {
+                            Log.e("CameraScreen", "Use case binding failed", e)
+                        }
+
+                        previewView
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            Button(
+                onClick = {
+                    takePhoto(imageCapture, context) { photo ->
+                        homeScreenViewModel.addPhotoToDatabase(photo)
+                        navController.popBackStack() // Navigate back to HomeScreen after saving
                     }
-
-                    try {
-                        val cameraSelector = androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
-                        cameraProvider.unbindAll()
-                        cameraProvider.bindToLifecycle(
-                            lifecycleOwner,
-                            cameraSelector,
-                            preview,
-                            imageCapture
-                        )
-                    } catch (e: Exception) {
-                        Log.e("CameraScreen", "Use case binding failed", e)
-                    }
-
-                    previewView
                 },
-                modifier = Modifier.fillMaxSize()
-            )
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Capture Photo")
+            }
         }
-
-        Button(
-            onClick = {
-                takePhoto(imageCapture, context) { photo ->
-                    homeScreenViewModel.addPhotoToDatabase(photo)
-                    navController.popBackStack() // Navigate back to HomeScreen after saving
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Capture Photo")
+    } else {
+        LaunchedEffect(Unit) {
+            cameraPermissionState.launchPermissionRequest()
         }
     }
 
-    LaunchedEffect(cameraProviderFuture) {
-        isCameraInitialized = cameraProviderFuture.isDone
-    }
+//    LaunchedEffect(cameraProviderFuture) {
+//        isCameraInitialized = cameraProviderFuture.isDone
+//    }
 }
 
 private fun takePhoto(imageCapture: ImageCapture, context: Context, onPhotoSaved: (Photo) -> Unit) {

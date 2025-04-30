@@ -41,6 +41,15 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+
+
+
+    implementation(libs.accompanist.permissions)
+
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
