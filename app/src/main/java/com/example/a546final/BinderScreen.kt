@@ -24,91 +24,78 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BinderScreen(navController: NavController, homeScreenViewModel: HomeScreenViewModel, photoViewModel: PhotoViewModel) {
+fun BinderScreen(navController: NavController, photoViewModel: PhotoViewModel) {
 
     val photos by photoViewModel.photos.observeAsState(emptyList())
     var selectedPhoto by remember { mutableStateOf<Photo?>(null) }
 
-    Scaffold (
+    Scaffold(
         topBar = {
-            TopAppBar(title = {  Text("View Photos")})
+            TopAppBar(title = { Text("View Photos") })
         }
-    ){ paddingValues ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
         ) {
-            Button( onClick = {
+            Button(onClick = {
                 navController.popBackStack()
             },
-            modifier = Modifier.fillMaxWidth()){
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text("Back")
             }
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(photos) { photo ->
-                    Card(
-                        elevation = CardDefaults.cardElevation(4.dp),
+            if (photos.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("No Photos yet.", textAlign = TextAlign.Center)
+                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(photos) { photo ->
+                        Card(
+                            elevation = CardDefaults.cardElevation(4.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { selectedPhoto = photo }
+                        ) {
+                            Image(
+                                painter = rememberAsyncImagePainter(photo.uri),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .background(Color.White)
+                                    .fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+                selectedPhoto?.let { photo ->
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { selectedPhoto = photo }
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.8f))
+                            .clickable { selectedPhoto = null }
                     ) {
                         Image(
                             painter = rememberAsyncImagePainter(photo.uri),
                             contentDescription = "",
-                            modifier = Modifier
-                                .background(Color.White)
-                                .fillMaxWidth()
+                            modifier = Modifier.fillMaxSize()
                         )
                     }
-
-                }
-            }
-            selectedPhoto?.let { photo ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.8f))
-                        .clickable { selectedPhoto = null }
-                ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(photo.uri),
-                        contentDescription = "",
-                        modifier = Modifier.fillMaxSize()
-                    )
                 }
             }
         }
     }
 }
-
-
-//
-//@Composable
-//fun CardItem(photo: Photo, onClick: () -> Unit) {
-//    Card (
-//        elevation = CardDefaults.cardElevation(4.dp),
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .clickable { onClick() },
-//    ) {
-//        Image(
-//            painter = rememberAsyncImagePainter(photo.uri),
-//            contentDescription = "",
-//            modifier = Modifier
-//                .background(Color.White)
-//                .fillMaxWidth()
-//        )
-//    }
-//
-//}

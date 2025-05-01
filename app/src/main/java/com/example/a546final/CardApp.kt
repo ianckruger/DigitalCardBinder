@@ -23,14 +23,13 @@ fun CardApp() {
         composable("take_photo") {
             CameraScreen(
                 navController = navController,
-                homeScreenViewModel = homeViewModel,
+                photoViewModel = photoViewModel
             )
         }
 
         composable("view_cards") {
             BinderScreen(
                 navController = navController,
-                homeScreenViewModel = homeViewModel,
                 photoViewModel = photoViewModel
             )
         }

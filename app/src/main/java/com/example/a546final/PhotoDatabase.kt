@@ -7,7 +7,6 @@ import androidx.room.RoomDatabase
 
 @Database(entities = [Photo::class], version = 2, exportSchema = false)
 abstract class PhotoDatabase : RoomDatabase() {
-
     abstract fun photoDao(): PhotoDao
 
     companion object {
@@ -20,9 +19,7 @@ abstract class PhotoDatabase : RoomDatabase() {
                     context.applicationContext,
                     PhotoDatabase::class.java,
                     "photo_database"
-                )
-                    .fallbackToDestructiveMigration() // Add this line
-                    .build()
+                ).build()
                 INSTANCE = instance
                 instance
             }
