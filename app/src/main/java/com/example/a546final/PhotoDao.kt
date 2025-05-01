@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PhotoDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(photo: Photo)
 
-    @Query("SELECT * FROM photo")
+    @Query("SELECT * FROM photos")
     fun getAllPhotos(): Flow<List<Photo>>
 }
