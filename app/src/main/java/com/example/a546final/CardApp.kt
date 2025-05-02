@@ -25,7 +25,7 @@ fun CardApp() {
             CameraScreen(
                 navController = navController,
                 homeScreenViewModel = homeViewModel,
-                cameraViewModel = cameraViewModel
+                photoViewModel = photoViewModel
             )
         }
 
