@@ -40,7 +40,7 @@ import androidx.navigation.NavController
 import java.io.File
 
 @Composable
-fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenViewModel, photoViewModel: PhotoViewModel) {
+fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val imageCapture = remember { ImageCapture.Builder().build() }

@@ -2,15 +2,14 @@ package com.example.a546final
 
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PhotoDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insert(photo: Photo)
 
-    @Query("SELECT * FROM photo")
+    @Query("SELECT * FROM photos")
     fun getAllPhotos(): Flow<List<Photo>>
 }
