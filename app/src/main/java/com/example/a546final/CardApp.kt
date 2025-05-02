@@ -24,8 +24,7 @@ fun CardApp() {
         composable("take_photo") {
             CameraScreen(
                 navController = navController,
-                homeScreenViewModel = homeViewModel,
-                cameraViewModel = cameraViewModel
+                homeScreenViewModel = homeViewModel
             )
         }
 
