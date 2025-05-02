@@ -1,9 +1,11 @@
 package com.example.a546final
 
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,9 +31,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,71 +50,83 @@ fun BinderScreen(
         topBar = {
             TopAppBar(title = { Text("View Photos") })
         }
-    ) { paddingValues ->
+    )
+    { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Display the number of photos
-            Text(
-                text = "Number of Photos: ${photos.size}",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            )
-            Button(
-                onClick = {
-                    navController.popBackStack()
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Back")
-            }
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(photos) { photo ->
-                    // Debug statement: log the photo's description
-                    Log.d("BinderScreen", "Photo Description: ${photo.name}")
-                    Card(
-                        elevation = CardDefaults.cardElevation(4.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { selectedPhoto = photo }
-                            .padding(8.dp)
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Image(
-                                painter = rememberAsyncImagePainter(photo.uri),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .background(Color.White)
-                                    .fillMaxWidth()
-                                    .wrapContentHeight()
-                            )
-                            Text(
-                                text = photo.name ?: "No Name",
-                                modifier = Modifier
-                                    .padding(8.dp)
-                            )
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // Display the number of photos
+                Text(
+                    text = "Number of Photos: ${photos.size}",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                )
+                Button(
+                    onClick = {
+                        navController.popBackStack()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Back")
+                }
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    items(photos) { photo ->
+                        // Debug statement: log the photo's description
+                        Log.d("BinderScreen", "Photo Description: ${photo.name}")
+                        Card(
+                            elevation = CardDefaults.cardElevation(4.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { selectedPhoto = photo }
+                                .padding(8.dp)
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                // Use the byte array to decode into a Bitmap, then to an ImageBitmap
+                                Image(
+                                    bitmap = BitmapFactory.decodeByteArray(
+                                        photo.image,
+                                        0,
+                                        photo.image.size
+                                    ).asImageBitmap(),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .background(Color.White)
+                                        .fillMaxWidth()
+                                        .wrapContentHeight()
+                                )
+                                Text(
+                                    text = photo.name,
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
-            selectedPhoto?.let { photo ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.8f))
-                        .clickable { selectedPhoto = null }
-                ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(photo.uri),
-                        contentDescription = "",
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+        }
+        selectedPhoto?.let { photo ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.8f))
+                    .clickable { selectedPhoto = null }
+            ) {
+                Image(
+                    bitmap = BitmapFactory.decodeByteArray(photo.image, 0, photo.image.size).asImageBitmap(),
+                    contentDescription = "",
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }

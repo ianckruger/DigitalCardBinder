@@ -3,6 +3,8 @@ package com.example.a546final
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -37,10 +39,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 
 @Composable
-fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenViewModel) {
+fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenViewModel, photoViewModel: PhotoViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val imageCapture = remember { ImageCapture.Builder().build() }
@@ -109,8 +113,14 @@ fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenVi
         Button(
             onClick = {
                 if (isCameraBound) {
-                    takePhoto(imageCapture, context) { photo ->
-                        homeScreenViewModel.addPhotoToDatabase(photo)
+                    takePhoto(imageCapture, context) { bitmap ->
+                        // Convert the bitmap to a ByteArray
+                        val byteArray = bitmapToByteArray(bitmap)
+                        // Create a Photo object
+                        val photo = Photo(name = "New Photo", image = byteArray)
+                        // Insert the photo into the database
+                        photoViewModel.insert(photo)
+                        // Navigate back
                         navController.popBackStack()
                     }
                 } else {
@@ -132,7 +142,7 @@ fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenVi
     }
 }
 
-private fun takePhoto(imageCapture: ImageCapture, context: Context, onPhotoSaved: (Photo) -> Unit) {
+private fun takePhoto(imageCapture: ImageCapture, context: Context, onPhotoSaved: (Bitmap) -> Unit) {
     val photoFile = File(context.cacheDir, "photo-${System.currentTimeMillis()}.jpg")
     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
@@ -141,8 +151,10 @@ private fun takePhoto(imageCapture: ImageCapture, context: Context, onPhotoSaved
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                val photo = Photo(name = "New Card", uri = photoFile.toURI().toString())
-                onPhotoSaved(photo)
+                // Load the saved image back into a Bitmap
+                val savedUri = outputFileResults.savedUri
+                val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+                onPhotoSaved(bitmap)
             }
 
             override fun onError(exception: ImageCaptureException) {
@@ -150,6 +162,13 @@ private fun takePhoto(imageCapture: ImageCapture, context: Context, onPhotoSaved
             }
         }
     )
+}
+
+// Helper function to convert Bitmap to ByteArray
+fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+    val outputStream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+    return outputStream.toByteArray()
 }
 
 private fun checkCameraPermission(context: Context): Boolean {

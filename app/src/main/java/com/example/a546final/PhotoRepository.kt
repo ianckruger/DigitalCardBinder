@@ -1,13 +1,15 @@
 package com.example.a546final
 
-import kotlinx.coroutines.flow.Flow
+import androidx.lifecycle.LiveData
 
 class PhotoRepository(private val photoDao: PhotoDao) {
-    suspend fun insertPhoto(photo: Photo) {
+
+    val allPhotos: LiveData<List<Photo>> = photoDao.getAllPhotos()
+
+    suspend fun insert(photo: Photo) {
         photoDao.insert(photo)
     }
-
-    fun getAllPhotos(): Flow<List<Photo>> {
-        return photoDao.getAllPhotos()
+    suspend fun deletePhoto(photo: Photo){
+        photoDao.deletePhoto(photo)
     }
 }
