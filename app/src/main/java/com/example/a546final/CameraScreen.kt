@@ -40,7 +40,7 @@ import androidx.navigation.NavController
 import java.io.File
 
 @Composable
-fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenViewModel) {
+fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenViewModel, photoViewModel: PhotoViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val imageCapture = remember { ImageCapture.Builder().build() }
@@ -110,7 +110,7 @@ fun CameraScreen(navController: NavController, homeScreenViewModel: HomeScreenVi
             onClick = {
                 if (isCameraBound) {
                     takePhoto(imageCapture, context) { photo ->
-                        homeScreenViewModel.addPhotoToDatabase(photo)
+                        photoViewModel.addPhotoToDatabase(photo)
                         navController.popBackStack()
                     }
                 } else {

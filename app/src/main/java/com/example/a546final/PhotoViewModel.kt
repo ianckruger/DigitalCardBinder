@@ -14,7 +14,7 @@ class PhotoViewModel(application: Application) : AndroidViewModel(application) {
     init {
         val dao = PhotoDatabase.getDatabase(application).photoDao()
         repo = PhotoRepository(dao)
-        photos = repo.getAllPhotos().asLiveData()
+        photos = repo.photos.asLiveData()
     }
 
     fun addPhotoToDatabase(photo: Photo) = viewModelScope.launch {
