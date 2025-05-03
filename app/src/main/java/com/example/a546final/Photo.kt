@@ -13,7 +13,7 @@ import java.io.ByteArrayOutputStream
 @TypeConverters(Converters::class) // Use the Converters class for custom type conversion
 data class Photo(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "image") val image: ByteArray // Store the image as a byte array
 )
 

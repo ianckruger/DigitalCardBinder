@@ -15,13 +15,16 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -32,6 +35,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
@@ -45,10 +50,11 @@ fun BinderScreen(
 
     val photos by photoViewModel.photos.observeAsState(emptyList())
     var selectedPhoto by remember { mutableStateOf<Photo?>(null) }
+    var editingName by remember { mutableStateOf<String?>(null)}
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("View Photos") })
+            CenterAlignedTopAppBar(title = { Text("View Photos") })
         }
     )
     { paddingValues ->
@@ -58,13 +64,15 @@ fun BinderScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier.fillMaxWidth()) {
                 // Display the number of photos
                 Text(
                     text = "Number of Photos: ${photos.size}",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(16.dp),
+                    textAlign = TextAlign.Center
                 )
                 Button(
                     onClick = {
@@ -81,6 +89,8 @@ fun BinderScreen(
                         .weight(1f)
                 ) {
                     items(photos) { photo ->
+                        val isEditing = editingName == photo.name
+                        var name by remember { mutableStateOf(photo.name)}
                         // Debug statement: log the photo's description
                         Log.d("BinderScreen", "Photo Description: ${photo.name}")
                         Card(
@@ -104,11 +114,32 @@ fun BinderScreen(
                                         .fillMaxWidth()
                                         .wrapContentHeight()
                                 )
-                                Text(
-                                    text = photo.name,
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                )
+
+                                if (isEditing){
+                                    TextField(
+                                        value = name,
+                                        onValueChange = {name = it},
+                                        singleLine = true,
+                                        modifier = Modifier
+                                            .padding(8.dp)
+                                            .fillMaxWidth(),
+                                        keyboardOptions = KeyboardOptions.Default.copy(
+                                            imeAction = ImeAction.Done),
+                                        keyboardActions = KeyboardActions(
+                                            onDone= { editingName = null
+                                            photo.name = name})
+                                    )
+                                } else {
+                                    Text(
+                                        text = photo.name,
+                                        modifier = Modifier
+                                            .padding(8.dp)
+                                            .clickable {
+                                                editingName = photo.name
+                                            }
+                                    )
+                                }
+
                             }
                         }
                     }
