@@ -22,4 +22,8 @@ class PhotoViewModel(application: Application) : AndroidViewModel(application) {
     fun deletePhoto(photo: Photo) = viewModelScope.launch{
         repository.deletePhoto(photo)
     }
+
+    fun updatePhotoName(photo: Photo) = viewModelScope.launch {
+        repository.updatePhoto(photo)
+    }
 }

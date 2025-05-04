@@ -161,7 +161,8 @@ fun BinderScreen(
                                             imeAction = ImeAction.Done),
                                         keyboardActions = KeyboardActions(
                                             onDone= { editingName = null
-                                            photo.name = name})
+                                            photo.name = name
+                                            photoViewModel.updatePhotoName(photo)})
                                     )
                                 } else {
                                     Text(
